@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slop.ai</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px 60px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #2ecc71;
+      letter-spacing: -1px;
+    }
+
+    header p {
+      margin-top: 8px;
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 16px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #2ecc71;
+    }
+
+    input[type="text"]::placeholder {
+      color: #555;
+    }
+
+    button#analyzeBtn {
+      background: #2ecc71;
+      border: none;
+      border-radius: 10px;
+      color: #0a0a0a;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 12px 20px;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    button#analyzeBtn:hover { background: #27ae60; }
+    button#analyzeBtn:active { transform: scale(0.97); }
+    button#analyzeBtn:disabled { background: #1a5c38; color: #555; cursor: not-allowed; }
+
+    /* Loading */
+    #loading {
+      display: none;
+      text-align: center;
+      margin-top: 28px;
+      color: #2ecc71;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #1a3d28;
+      border-top-color: #2ecc71;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    #error {
+      display: none;
+      margin-top: 20px;
+      background: #1a0a0a;
+      border: 1px solid #5c1a1a;
+      border-radius: 10px;
+      color: #e74c3c;
+      font-size: 0.9rem;
+      padding: 12px 16px;
+    }
+
+    /* Results */
+    #results {
+      display: none;
+      margin-top: 28px;
+    }
+
+    .product-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .product-image {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: #1a1a1a;
+      border: 1px solid #222;
+      flex-shrink: 0;
+    }
+
+    .product-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f0f0f0;
+      line-height: 1.3;
+    }
+
+    /* Score */
+    .score-block {
+      background: #0f0f0f;
+      border: 1px solid #1e1e1e;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .score-label {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .score-number {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-badge {
+      display: inline-block;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      margin-top: 10px;
+      padding: 4px 16px;
+      text-transform: uppercase;
+    }
+
+    .score-bar-track {
+      background: #1a1a1a;
+      border-radius: 999px;
+      height: 6px;
+      margin-top: 14px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .score-bar-fill {
+      border-radius: 999px;
+      height: 100%;
+      transition: width 0.6s ease;
+    }
+
+    /* Color themes */
+    .clean   { color: #2ecc71; }
+    .good    { color: #a8e063; }
+    .processed { color: #f39c12; }
+    .slop    { color: #e74c3c; }
+
+    .badge-clean     { background: #1a3d28; color: #2ecc71; }
+    .badge-good      { background: #2a3b10; color: #a8e063; }
+    .badge-processed { background: #3d2a00; color: #f39c12; }
+    .badge-slop      { background: #3d0f0f; color: #e74c3c; }
+
+    .bar-clean     { background: #2ecc71; }
+    .bar-good      { background: #a8e063; }
+    .bar-processed { background: #f39c12; }
+    .bar-slop      { background: #e74c3c; }
+
+    /* Detail rows */
+    .detail-row {
+      background: #0f0f0f;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+
+    .detail-row .detail-key {
+      color: #888;
+    }
+
+    .detail-row .detail-val {
+      color: #e0e0e0;
+      font-weight: 600;
+    }
+
+    /* Additives */
+    .additives-block {
+      background: #0f0f0f;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .additives-title {
+      color: #888;
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .additives-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .additive-tag {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      color: #ccc;
+      font-size: 0.82rem;
+      padding: 4px 10px;
+    }
+
+    .no-additives {
+      color: #2ecc71;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 400px) {
+      header h1 { font-size: 2.2rem; }
+      .input-group { flex-direction: column; }
+      button#analyzeBtn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Slop.ai</h1>
+    <p>Scan products. See what's really inside.</p>
+  </header>
+
+  <div class="card">
+    <div class="input-group">
+      <input type="text" id="barcodeInput" placeholder="Enter barcode" maxlength="50" />
+      <button id="analyzeBtn" onclick="analyze()">Analyze Product</button>
+    </div>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      <p>Analyzing product...</p>
+    </div>
+
+    <div id="error"></div>
+
+    <div id="results">
+      <div class="product-header">
+        <img id="productImage" class="product-image" src="" alt="" />
+        <div id="productName" class="product-name"></div>
+      </div>
+
+      <div class="score-block">
+        <div class="score-label">Slop Score</div>
+        <div id="scoreNumber" class="score-number"></div>
+        <div id="scoreBadge" class="score-badge"></div>
+        <div class="score-bar-track">
+          <div id="scoreBar" class="score-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-key">Sugar content</span>
+        <span id="sugarContent" class="detail-val"></span>
+      </div>
+
+      <div class="additives-block">
+        <div class="additives-title">Additives</div>
+        <div id="additivesList" class="additives-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const input    = document.getElementById('barcodeInput');
+    const btn      = document.getElementById('analyzeBtn');
+    const loading  = document.getElementById('loading');
+    const errorBox = document.getElementById('error');
+    const results  = document.getElementById('results');
+
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') analyze(); });
+
+    function getScoreMeta(score) {
+      if (score >= 90) return { label: 'CLEAN',     cls: 'clean',     badgeCls: 'badge-clean',     barCls: 'bar-clean'     };
+      if (score >= 70) return { label: 'GOOD',      cls: 'good',      badgeCls: 'badge-good',      barCls: 'bar-good'      };
+      if (score >= 50) return { label: 'PROCESSED', cls: 'processed', badgeCls: 'badge-processed', barCls: 'bar-processed' };
+      return              { label: 'SLOP',      cls: 'slop',      badgeCls: 'badge-slop',      barCls: 'bar-slop'      };
+    }
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.style.display = 'block';
+    }
+
+    function reset() {
+      loading.style.display  = 'none';
+      errorBox.style.display = 'none';
+      results.style.display  = 'none';
+      errorBox.textContent   = '';
+    }
+
+    async function analyze() {
+      const barcode = input.value.trim();
+      if (!barcode) {
+        reset();
+        showError('Please enter a barcode.');
+        return;
+      }
+
+      reset();
+      loading.style.display = 'block';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('https://slopai-backend.onrender.com/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ barcode })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error || `Server error (${res.status})`);
+        }
+
+        renderResults(data);
+      } catch (err) {
+        showError(err.message || 'Something went wrong. Please try again.');
+      } finally {
+        loading.style.display = 'none';
+        btn.disabled = false;
+      }
+    }
+
+    function renderResults(data) {
+      const score = Math.max(0, Math.min(100, Number(data.slopScore) || 0));
+      const meta  = getScoreMeta(score);
+
+      // Product name
+      document.getElementById('productName').textContent = data.productName || 'Unknown Product';
+
+      // Image
+      const img = document.getElementById('productImage');
+      if (data.imageUrl) {
+        img.src = data.imageUrl;
+        img.alt = data.productName || 'Product';
+        img.style.display = 'block';
+      } else {
+        img.style.display = 'none';
+      }
+
+      // Score
+      const scoreNum   = document.getElementById('scoreNumber');
+      const scoreBadge = document.getElementById('scoreBadge');
+      const scoreBar   = document.getElementById('scoreBar');
+
+      scoreNum.textContent = score;
+      scoreNum.className   = `score-number ${meta.cls}`;
+
+      scoreBadge.textContent = meta.label;
+      scoreBadge.className   = `score-badge ${meta.badgeCls}`;
+
+      scoreBar.style.width = `${score}%`;
+      scoreBar.className   = `score-bar-fill ${meta.barCls}`;
+
+      // Sugar
+      document.getElementById('sugarContent').textContent =
+        data.sugar != null ? data.sugar : 'N/A';
+
+      // Additives
+      const list = document.getElementById('additivesList');
+      list.innerHTML = '';
+      const additives = Array.isArray(data.additives) ? data.additives : [];
+      if (additives.length === 0) {
+        list.innerHTML = '<span class="no-additives">None detected</span>';
+      } else {
+        additives.forEach(a => {
+          const tag = document.createElement('span');
+          tag.className   = 'additive-tag';
+          tag.textContent = a;
+          list.appendChild(tag);
+        });
+      }
+
+      results.style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
