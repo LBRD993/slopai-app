@@ -50,6 +50,12 @@
       gap: 10px;
     }
 
+    .scan-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
     input[type="text"] {
       flex: 1;
       background: #1a1a1a;
@@ -86,6 +92,66 @@
     button#analyzeBtn:hover { background: #27ae60; }
     button#analyzeBtn:active { transform: scale(0.97); }
     button#analyzeBtn:disabled { background: #1a5c38; color: #555; cursor: not-allowed; }
+
+    button#scanBtn {
+      background: #1b1b1b;
+      border: 1px solid #2f2f2f;
+      border-radius: 10px;
+      color: #cfcfcf;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 11px 14px;
+      width: 100%;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    button#scanBtn:hover {
+      background: #222;
+      border-color: #3a3a3a;
+    }
+
+    .camera-panel {
+      display: none;
+      margin-top: 12px;
+      background: #0f0f0f;
+      border: 1px solid #1f1f1f;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .camera-panel.open { display: block; }
+
+    #reader {
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #050505;
+      border: 1px solid #222;
+    }
+
+    .camera-help {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: #7b7b7b;
+      line-height: 1.4;
+    }
+
+    .camera-controls {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .camera-close {
+      background: transparent;
+      border: 1px solid #303030;
+      color: #aaa;
+      border-radius: 8px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 0.78rem;
+    }
 
     /* Loading */
     #loading {
@@ -379,6 +445,7 @@
       header h1 { font-size: 2.2rem; }
       .input-group { flex-direction: column; }
       button#analyzeBtn { width: 100%; }
+      .scan-actions { flex-direction: column; }
       .macro-val { font-size: 0.8rem; }
     }
   </style>
@@ -394,6 +461,18 @@
     <div class="input-group">
       <input type="text" id="barcodeInput" placeholder="Enter barcode" maxlength="50" />
       <button id="analyzeBtn" onclick="analyze()">Analyze Product</button>
+    </div>
+
+    <div class="scan-actions">
+      <button id="scanBtn" onclick="startScanner()">Scan with Camera</button>
+    </div>
+
+    <div id="cameraPanel" class="camera-panel">
+      <div id="reader"></div>
+      <p id="cameraStatus" class="camera-help">Point your camera at a barcode. Detection starts automatically.</p>
+      <div class="camera-controls">
+        <button class="camera-close" onclick="stopScanner()">Close Camera</button>
+      </div>
     </div>
 
     <div id="loading">
@@ -467,12 +546,19 @@
     </div>
   </div>
 
+  <script src="https://unpkg.com/html5-qrcode" defer></script>
   <script>
     const input    = document.getElementById('barcodeInput');
     const btn      = document.getElementById('analyzeBtn');
     const loading  = document.getElementById('loading');
     const errorBox = document.getElementById('error');
     const results  = document.getElementById('results');
+    const cameraPanel = document.getElementById('cameraPanel');
+    const cameraStatus = document.getElementById('cameraStatus');
+
+    let html5QrCode = null;
+    let scannerActive = false;
+    let lastScan = '';
 
     input.addEventListener('keydown', e => { if (e.key === 'Enter') analyze(); });
 
@@ -493,6 +579,78 @@
       errorBox.style.display = 'none';
       results.style.display  = 'none';
       errorBox.textContent   = '';
+    }
+
+    async function startScanner() {
+      if (!window.Html5Qrcode) {
+        showError('Camera scanner failed to load. You can still enter a barcode manually.');
+        return;
+      }
+
+      if (scannerActive) return;
+
+      cameraPanel.classList.add('open');
+      cameraStatus.textContent = 'Requesting camera permission...';
+
+      try {
+        if (!html5QrCode) {
+          html5QrCode = new Html5Qrcode('reader');
+        }
+
+        await html5QrCode.start(
+          { facingMode: 'environment' },
+          {
+            fps: 10,
+            qrbox: (viewfinderWidth, viewfinderHeight) => {
+              const edge = Math.min(viewfinderWidth, viewfinderHeight) * 0.75;
+              return { width: edge, height: edge * 0.45 };
+            },
+            rememberLastUsedCamera: true,
+            aspectRatio: 1.6
+          },
+          onBarcodeDetected,
+          () => {}
+        );
+
+        scannerActive = true;
+        cameraStatus.textContent = 'Scanning... center the barcode inside the frame.';
+      } catch (err) {
+        cameraStatus.textContent = 'Could not access camera. You can still type the barcode manually.';
+        showError('Camera access failed. Please allow permission or use manual input.');
+      }
+    }
+
+    async function stopScanner() {
+      cameraPanel.classList.remove('open');
+      if (!html5QrCode || !scannerActive) return;
+
+      try {
+        await html5QrCode.stop();
+      } catch (_) {
+        // Ignore scanner stop errors and continue cleanup.
+      }
+
+      try {
+        await html5QrCode.clear();
+      } catch (_) {
+        // Ignore clear errors.
+      }
+
+      scannerActive = false;
+      cameraStatus.textContent = 'Point your camera at a barcode. Detection starts automatically.';
+    }
+
+    async function onBarcodeDetected(decodedText) {
+      const value = String(decodedText || '').trim();
+      if (!value || value === lastScan) return;
+      lastScan = value;
+
+      input.value = value;
+      cameraStatus.textContent = `Detected barcode: ${value}. Analyzing...`;
+      await stopScanner();
+      analyze();
+
+      setTimeout(() => { lastScan = ''; }, 1500);
     }
 
     async function analyze() {
