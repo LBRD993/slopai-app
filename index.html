@@ -273,10 +273,97 @@
       font-size: 0.9rem;
     }
 
+    /* Macro strip */
+    .macro-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .macro-item {
+      background: #0f0f0f;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 4px 8px;
+      gap: 2px;
+    }
+
+    .macro-icon { font-size: 1.1rem; line-height: 1; }
+
+    .macro-val {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f0f0f0;
+    }
+
+    .macro-key {
+      font-size: 0.65rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Expand button */
+    .expand-btn {
+      width: 100%;
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      color: #888;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 11px 16px;
+      text-align: center;
+      transition: background 0.2s, color 0.2s;
+      margin-bottom: 10px;
+    }
+
+    .expand-btn:hover { background: #1e1e1e; color: #ccc; }
+
+    /* Full nutrition panel */
+    .full-nutrition { display: none; }
+    .full-nutrition.open { display: block; }
+
+    .nutrition-table {
+      background: #0f0f0f;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .nt-header {
+      padding: 8px 16px;
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #555;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .nt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 16px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .nt-row:last-child { border-bottom: none; }
+    .nt-key { color: #888; }
+    .nt-val { color: #e0e0e0; font-weight: 600; }
+
     @media (max-width: 400px) {
       header h1 { font-size: 2.2rem; }
       .input-group { flex-direction: column; }
       button#analyzeBtn { width: 100%; }
+      .macro-val { font-size: 0.8rem; }
     }
   </style>
 </head>
@@ -315,14 +402,47 @@
         </div>
       </div>
 
-      <div class="detail-row">
-        <span class="detail-key">Sugar content</span>
-        <span id="sugarContent" class="detail-val"></span>
+      <div class="macro-strip">
+        <div class="macro-item">
+          <span class="macro-icon">💪</span>
+          <span id="macroProtein" class="macro-val">—</span>
+          <span class="macro-key">Protein</span>
+        </div>
+        <div class="macro-item">
+          <span class="macro-icon">🍞</span>
+          <span id="macroCarbs" class="macro-val">—</span>
+          <span class="macro-key">Carbs</span>
+        </div>
+        <div class="macro-item">
+          <span class="macro-icon">🥑</span>
+          <span id="macroFat" class="macro-val">—</span>
+          <span class="macro-key">Fat</span>
+        </div>
+        <div class="macro-item">
+          <span class="macro-icon">🔥</span>
+          <span id="macroCalories" class="macro-val">—</span>
+          <span class="macro-key">kcal</span>
+        </div>
       </div>
 
-      <div class="additives-block">
-        <div class="additives-title">Additives</div>
-        <div id="additivesList" class="additives-list"></div>
+      <button class="expand-btn" id="expandBtn" onclick="toggleNutrition()">View Full Nutrition <span id="expandArrow">▼</span></button>
+
+      <div id="fullNutrition" class="full-nutrition">
+        <div class="nutrition-table">
+          <div class="nt-header">Per 100g</div>
+          <div class="nt-row"><span class="nt-key">Calories</span><span id="ntCalories" class="nt-val"></span></div>
+          <div class="nt-row"><span class="nt-key">Protein</span><span id="ntProtein" class="nt-val"></span></div>
+          <div class="nt-row"><span class="nt-key">Carbohydrates</span><span id="ntCarbs" class="nt-val"></span></div>
+          <div class="nt-row"><span class="nt-key">Fat</span><span id="ntFat" class="nt-val"></span></div>
+          <div class="nt-row"><span class="nt-key">Fiber</span><span id="ntFiber" class="nt-val"></span></div>
+          <div class="nt-row"><span class="nt-key">Sugar</span><span id="ntSugar" class="nt-val"></span></div>
+          <div class="nt-row"><span class="nt-key">Salt</span><span id="ntSalt" class="nt-val"></span></div>
+        </div>
+
+        <div class="additives-block">
+          <div class="additives-title">Additives</div>
+          <div id="additivesList" class="additives-list"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -393,10 +513,8 @@
       const score = Math.max(0, Math.min(100, Number(data.slopScore) || 0));
       const meta  = getScoreMeta(score);
 
-      // Product name
+      // Product name & image
       document.getElementById('productName').textContent = data.productName || 'Unknown Product';
-
-      // Image
       const img = document.getElementById('productImage');
       if (data.imageUrl) {
         img.src = data.imageUrl;
@@ -410,19 +528,28 @@
       const scoreNum   = document.getElementById('scoreNumber');
       const scoreBadge = document.getElementById('scoreBadge');
       const scoreBar   = document.getElementById('scoreBar');
-
-      scoreNum.textContent = score;
-      scoreNum.className   = `score-number ${meta.cls}`;
-
+      scoreNum.textContent   = score;
+      scoreNum.className     = `score-number ${meta.cls}`;
       scoreBadge.textContent = meta.label;
       scoreBadge.className   = `score-badge ${meta.badgeCls}`;
+      scoreBar.style.width   = `${score}%`;
+      scoreBar.className     = `score-bar-fill ${meta.barCls}`;
 
-      scoreBar.style.width = `${score}%`;
-      scoreBar.className   = `score-bar-fill ${meta.barCls}`;
+      // Macro strip
+      const g = v => v != null ? `${Math.round(v * 10) / 10}g` : '—';
+      document.getElementById('macroProtein').textContent  = g(data.protein);
+      document.getElementById('macroCarbs').textContent    = g(data.carbs);
+      document.getElementById('macroFat').textContent      = g(data.fat);
+      document.getElementById('macroCalories').textContent = data.calories != null ? data.calories : '—';
 
-      // Sugar
-      document.getElementById('sugarContent').textContent =
-        data.sugar != null ? data.sugar : 'N/A';
+      // Full nutrition table
+      document.getElementById('ntCalories').textContent = data.calories != null ? `${data.calories} kcal` : 'N/A';
+      document.getElementById('ntProtein').textContent  = g(data.protein);
+      document.getElementById('ntCarbs').textContent    = g(data.carbs);
+      document.getElementById('ntFat').textContent      = g(data.fat);
+      document.getElementById('ntFiber').textContent    = g(data.fiber);
+      document.getElementById('ntSugar').textContent    = data.sugar != null ? data.sugar : 'N/A';
+      document.getElementById('ntSalt').textContent     = g(data.salt);
 
       // Additives
       const list = document.getElementById('additivesList');
@@ -439,7 +566,18 @@
         });
       }
 
+      // Reset expand state on new scan
+      document.getElementById('fullNutrition').classList.remove('open');
+      document.getElementById('expandBtn').innerHTML = 'View Full Nutrition <span id="expandArrow">▼</span>';
+
       results.style.display = 'block';
+    }
+
+    function toggleNutrition() {
+      const panel = document.getElementById('fullNutrition');
+      const isOpen = panel.classList.toggle('open');
+      document.getElementById('expandBtn').innerHTML =
+        `${isOpen ? 'Hide' : 'View'} Full Nutrition <span id="expandArrow">${isOpen ? '▲' : '▼'}</span>`;
     }
   </script>
 
