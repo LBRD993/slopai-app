@@ -903,10 +903,17 @@
       const additives = Array.isArray(data.additives) ? data.additives : [];
       const seen = new Set();
       const unique = additives.filter(a => {
-        const code = typeof a === 'object' ? (a.commonName || a.name || '') : String(a);
-        const base = code.replace(/[a-z]+$/i, '').replace(/\s*\(.*\)$/, '').trim().toUpperCase();
-        if (!base || seen.has(base)) return false;
-        seen.add(base);
+        if (typeof a === 'object') {
+          const cn = (a.commonName || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+          const base = cn.replace(/[A-Z]+$/, '').trim();
+          const key = base || cn || (a.name || '').toUpperCase();
+          if (!key || seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        }
+        const s = String(a).trim().toUpperCase();
+        if (!s || seen.has(s)) return false;
+        seen.add(s);
         return true;
       });
       if (unique.length === 0) {
@@ -922,7 +929,7 @@
           if (fullName && fullName !== code) {
             const detail = document.createElement('span');
             detail.className = 'additive-full';
-            detail.textContent = '— ' + fullName;
+            detail.textContent = '— ' + fullName + ' (' + code + ')';
             tag.appendChild(detail);
             tag.addEventListener('click', () => tag.classList.toggle('expanded'));
           }
