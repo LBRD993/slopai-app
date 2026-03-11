@@ -439,6 +439,25 @@
       color: #ccc;
       font-size: 0.82rem;
       padding: 4px 10px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      user-select: none;
+    }
+
+    .additive-tag:hover {
+      background: #222;
+      border-color: #3a3a3a;
+    }
+
+    .additive-tag .additive-full {
+      display: none;
+      margin-left: 4px;
+      color: #888;
+      font-size: 0.78rem;
+    }
+
+    .additive-tag.expanded .additive-full {
+      display: inline;
     }
 
     .no-additives {
@@ -878,17 +897,35 @@
       document.getElementById('ntSugar').textContent    = data.sugar != null ? data.sugar : 'N/A';
       document.getElementById('ntSalt').textContent     = g(data.salt);
 
-      // Additives
+      // Additives — deduplicate by base E-number and show commonName in pill
       const list = document.getElementById('additivesList');
       list.innerHTML = '';
       const additives = Array.isArray(data.additives) ? data.additives : [];
-      if (additives.length === 0) {
+      const seen = new Set();
+      const unique = additives.filter(a => {
+        const code = typeof a === 'object' ? (a.commonName || a.name || '') : String(a);
+        const base = code.replace(/[a-z]+$/i, '').replace(/\s*\(.*\)$/, '').trim().toUpperCase();
+        if (!base || seen.has(base)) return false;
+        seen.add(base);
+        return true;
+      });
+      if (unique.length === 0) {
         list.innerHTML = '<span class="no-additives">None detected</span>';
       } else {
-        additives.forEach(a => {
+        unique.forEach(a => {
+          const isObj = typeof a === 'object';
+          const code = isObj ? (a.commonName || a.name || 'Unknown') : String(a);
+          const fullName = isObj && a.name ? a.name : '';
           const tag = document.createElement('span');
-          tag.className   = 'additive-tag';
-          tag.textContent = typeof a === 'object' ? (a.commonName || a.name || 'Unknown') : a;
+          tag.className = 'additive-tag';
+          tag.textContent = code;
+          if (fullName && fullName !== code) {
+            const detail = document.createElement('span');
+            detail.className = 'additive-full';
+            detail.textContent = '— ' + fullName;
+            tag.appendChild(detail);
+            tag.addEventListener('click', () => tag.classList.toggle('expanded'));
+          }
           list.appendChild(tag);
         });
       }
