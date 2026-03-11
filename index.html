@@ -28,6 +28,9 @@
     header {
       text-align: center;
       margin-bottom: 40px;
+      position: relative;
+      width: 100%;
+      max-width: 500px;
     }
 
     header h1 {
@@ -44,6 +47,31 @@
       font-size: 0.95rem;
       font-weight: 300;
       letter-spacing: 0.2px;
+    }
+
+    .info-btn {
+      position: absolute;
+      top: 4px;
+      right: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid #2a2a2a;
+      background: #151515;
+      color: #737373;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .info-btn:hover {
+      background: #1e1e1e;
+      color: #10b981;
+      border-color: #10b981;
     }
 
     .card {
@@ -284,22 +312,116 @@
     /* Loading */
     #loading {
       display: none;
+      margin-top: 32px;
+    }
+
+    .skeleton-header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    .skeleton-img {
+      width: 96px;
+      height: 96px;
+      border-radius: 14px;
+      flex-shrink: 0;
+    }
+
+    .skeleton-text-group { flex: 1; }
+    .skeleton-text-lg { height: 20px; border-radius: 6px; width: 75%; margin-bottom: 10px; }
+    .skeleton-text-sm { height: 14px; border-radius: 4px; width: 50%; }
+
+    .skeleton-score-block {
+      border-radius: 18px;
+      padding: 36px 28px 32px;
       text-align: center;
-      margin-top: 28px;
+      margin-bottom: 20px;
+      border: 1px solid #1e1e1e;
+      background: #0c0c0c;
+    }
+
+    .skeleton-label { height: 10px; width: 80px; border-radius: 4px; margin: 0 auto 18px; }
+    .skeleton-score { height: 64px; width: 120px; border-radius: 12px; margin: 0 auto 18px; }
+    .skeleton-badge { height: 28px; width: 100px; border-radius: 999px; margin: 0 auto 18px; }
+    .skeleton-bar { height: 7px; border-radius: 999px; width: 100%; }
+
+    .skeleton-macros {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .skeleton-macro {
+      border: 1px solid #1e1e1e;
+      border-radius: 12px;
+      padding: 18px 6px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: #0c0c0c;
+    }
+
+    .skeleton-macro-icon { width: 24px; height: 24px; border-radius: 6px; }
+    .skeleton-macro-val { width: 32px; height: 16px; border-radius: 4px; }
+    .skeleton-macro-key { width: 28px; height: 8px; border-radius: 3px; }
+
+    .skeleton-additives {
+      border: 1px solid #1e1e1e;
+      border-radius: 14px;
+      padding: 16px 18px;
+      background: #0c0c0c;
+    }
+
+    .skeleton-additives-label { height: 10px; width: 70px; border-radius: 4px; margin-bottom: 14px; }
+    .skeleton-pills { display: flex; gap: 8px; }
+    .skeleton-pill { height: 26px; width: 52px; border-radius: 8px; }
+    .skeleton-pill:nth-child(2) { width: 64px; }
+    .skeleton-pill:nth-child(3) { width: 48px; }
+
+    .shimmer {
+      background: linear-gradient(90deg, #151515 25%, #1e1e1e 37%, #151515 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.4s ease infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .loading-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
       color: #10b981;
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.3px;
     }
 
-    .spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid #064e3b;
-      border-top-color: #10b981;
+    .loading-dot {
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 0 auto 12px;
+      background: #10b981;
+      animation: loadPulse 1s ease-in-out infinite;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-dot:nth-child(2) { animation-delay: 0.15s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes loadPulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1); }
+    }
 
     /* Error */
     #error {
@@ -317,6 +439,18 @@
     #results {
       display: none;
       margin-top: 32px;
+    }
+
+    #results.fade-in .product-header { animation: fadeUp 0.4s ease both; }
+    #results.fade-in .score-block { animation: fadeUp 0.4s ease 0.08s both; }
+    #results.fade-in .macro-strip { animation: fadeUp 0.4s ease 0.16s both; }
+    #results.fade-in .additives-block { animation: fadeUp 0.35s ease 0.24s both; }
+    #results.fade-in .seed-oils-block { animation: fadeUp 0.35s ease 0.3s both; }
+    #results.fade-in .expand-btn { animation: fadeUp 0.3s ease 0.36s both; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .product-header {
@@ -771,6 +905,201 @@
       .macro-icon { font-size: 1.3rem; }
       .macro-val { font-size: 0.88rem; }
     }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px 24px;
+      color: #525252;
+    }
+
+    .empty-state-icon {
+      font-size: 2.4rem;
+      margin-bottom: 14px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 0.88rem;
+      font-weight: 300;
+      line-height: 1.6;
+      color: #525252;
+    }
+
+    .empty-state-cta {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: #10b981;
+      cursor: pointer;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+
+    .empty-state-cta:hover { opacity: 0.8; }
+
+    /* Modal overlay */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: modalFadeIn 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      background: #111111;
+      border: 1px solid #1e1e1e;
+      border-radius: 18px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
+      animation: modalSlideUp 0.25s ease;
+    }
+
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid #2a2a2a;
+      background: #1a1a1a;
+      color: #737373;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .modal-close:hover { background: #252525; color: #f5f5f5; }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #f5f5f5;
+      margin-bottom: 14px;
+      letter-spacing: -0.3px;
+    }
+
+    .modal-desc {
+      font-size: 0.82rem;
+      font-weight: 300;
+      line-height: 1.65;
+      color: #a3a3a3;
+      margin-bottom: 18px;
+    }
+
+    .modal-section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #525252;
+      margin-bottom: 8px;
+    }
+
+    .modal-demo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0c0c0c;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+    }
+
+    .modal-demo-code {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #f5f5f5;
+      font-family: 'Inter', monospace;
+      letter-spacing: 0.5px;
+    }
+
+    .modal-demo-label {
+      font-size: 0.72rem;
+      color: #737373;
+      font-weight: 300;
+    }
+
+    .modal-demo-btn {
+      margin-left: auto;
+      background: #10b981;
+      border: none;
+      border-radius: 8px;
+      color: #0a0a0a;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .modal-demo-btn:hover { background: #059669; }
+
+    .modal-steps {
+      list-style: none;
+      padding: 0;
+    }
+
+    .modal-steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: #a3a3a3;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .modal-steps li:last-child { margin-bottom: 0; }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #10b981;
+      font-size: 0.68rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
   </style>
 </head>
 <body>
@@ -778,6 +1107,7 @@
   <header>
     <h1>Slop.ai</h1>
     <p>Scan products. See what's really inside.</p>
+    <button class="info-btn" onclick="openModal()" aria-label="About Slop.ai">?</button>
   </header>
 
   <div class="card">
@@ -818,11 +1148,48 @@
     </div>
 
     <div id="loading">
-      <div class="spinner"></div>
-      <p>Analyzing product...</p>
+      <div class="skeleton-header">
+        <div class="skeleton-img shimmer"></div>
+        <div class="skeleton-text-group">
+          <div class="skeleton-text-lg shimmer"></div>
+          <div class="skeleton-text-sm shimmer"></div>
+        </div>
+      </div>
+      <div class="skeleton-score-block">
+        <div class="skeleton-label shimmer" style="margin:0 auto 18px"></div>
+        <div class="skeleton-score shimmer" style="margin:0 auto 18px"></div>
+        <div class="skeleton-badge shimmer" style="margin:0 auto 18px"></div>
+        <div class="skeleton-bar shimmer"></div>
+      </div>
+      <div class="skeleton-macros">
+        <div class="skeleton-macro"><div class="skeleton-macro-icon shimmer"></div><div class="skeleton-macro-val shimmer"></div><div class="skeleton-macro-key shimmer"></div></div>
+        <div class="skeleton-macro"><div class="skeleton-macro-icon shimmer"></div><div class="skeleton-macro-val shimmer"></div><div class="skeleton-macro-key shimmer"></div></div>
+        <div class="skeleton-macro"><div class="skeleton-macro-icon shimmer"></div><div class="skeleton-macro-val shimmer"></div><div class="skeleton-macro-key shimmer"></div></div>
+        <div class="skeleton-macro"><div class="skeleton-macro-icon shimmer"></div><div class="skeleton-macro-val shimmer"></div><div class="skeleton-macro-key shimmer"></div></div>
+      </div>
+      <div class="skeleton-additives">
+        <div class="skeleton-additives-label shimmer"></div>
+        <div class="skeleton-pills">
+          <div class="skeleton-pill shimmer"></div>
+          <div class="skeleton-pill shimmer"></div>
+          <div class="skeleton-pill shimmer"></div>
+        </div>
+      </div>
+      <div class="loading-status">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <span>Analyzing product</span>
+      </div>
     </div>
 
     <div id="error"></div>
+
+    <div id="emptyState" class="empty-state">
+      <div class="empty-state-icon">📦</div>
+      <div class="empty-state-text">Scan a product or enter a barcode to begin</div>
+      <div class="empty-state-cta" onclick="openModal()">New here? Learn more →</div>
+    </div>
 
     <div id="results">
       <div class="product-header">
@@ -893,6 +1260,28 @@
     </div>
   </div>
 
+  <div id="aboutModal" class="modal-overlay" onclick="closeModalOutside(event)">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+      <div class="modal-title">About Slop.ai</div>
+      <div class="modal-desc">Research-backed food scanner for fitness enthusiasts. Scan any barcode to see a quality score, additives with scientific sources, and seed oil warnings.</div>
+      <div class="modal-section-label">Try it</div>
+      <div class="modal-demo">
+        <div>
+          <div class="modal-demo-code">3017620422003</div>
+          <div class="modal-demo-label">Nutella</div>
+        </div>
+        <button class="modal-demo-btn" onclick="tryDemo()">Try it</button>
+      </div>
+      <div class="modal-section-label">How it works</div>
+      <ol class="modal-steps">
+        <li><span class="step-num">1</span>Scan a barcode with your camera or type it in manually</li>
+        <li><span class="step-num">2</span>AI analyzes ingredients, additives, and nutritional data from research databases</li>
+        <li><span class="step-num">3</span>Get a Slop Score from 0–100 with detailed breakdowns and sources</li>
+      </ol>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/html5-qrcode" defer></script>
   <script>
     const input    = document.getElementById('barcodeInput');
@@ -935,6 +1324,7 @@
       loading.style.display  = 'none';
       errorBox.style.display = 'none';
       results.style.display  = 'none';
+      document.getElementById('emptyState').style.display = 'none';
       errorBox.textContent   = '';
     }
 
@@ -1050,11 +1440,12 @@
           throw new Error(data.error || `Server error (${res.status})`);
         }
 
+        loading.style.display = 'none';
         renderResults(data);
       } catch (err) {
+        loading.style.display = 'none';
         showError(err.message || 'Something went wrong. Please try again.');
       } finally {
-        loading.style.display = 'none';
         btn.disabled = false;
       }
     }
@@ -1236,7 +1627,11 @@
       document.getElementById('fullNutrition').classList.remove('open');
       document.getElementById('expandBtn').innerHTML = 'View Full Nutrition <span id="expandArrow">▼</span>';
 
+      results.classList.remove('fade-in');
       results.style.display = 'block';
+      // Trigger reflow then add fade-in class for staggered animations
+      void results.offsetWidth;
+      results.classList.add('fade-in');
     }
 
     function toggleNutrition() {
@@ -1254,6 +1649,24 @@
 
     function escapeAttr(str) {
       return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function openModal() {
+      document.getElementById('aboutModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('aboutModal').classList.remove('open');
+    }
+
+    function closeModalOutside(e) {
+      if (e.target === e.currentTarget) closeModal();
+    }
+
+    function tryDemo() {
+      closeModal();
+      input.value = '3017620422003';
+      analyze();
     }
   </script>
 
