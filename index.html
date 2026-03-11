@@ -888,7 +888,7 @@
         additives.forEach(a => {
           const tag = document.createElement('span');
           tag.className   = 'additive-tag';
-          tag.textContent = a;
+          tag.textContent = typeof a === 'object' ? (a.commonName || a.name || 'Unknown') : a;
           list.appendChild(tag);
         });
       }
