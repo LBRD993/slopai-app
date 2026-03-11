@@ -94,47 +94,147 @@
     button#analyzeBtn:disabled { background: #1a5c38; color: #555; cursor: not-allowed; }
 
     button#scanBtn {
-      background: #1b1b1b;
+      background: linear-gradient(135deg, #1b1b1b 0%, #151515 100%);
       border: 1px solid #2f2f2f;
       border-radius: 10px;
       color: #cfcfcf;
       cursor: pointer;
       font-size: 0.9rem;
       font-weight: 600;
-      padding: 11px 14px;
+      padding: 13px 14px;
       width: 100%;
-      transition: background 0.2s, border-color 0.2s;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     button#scanBtn:hover {
-      background: #222;
-      border-color: #3a3a3a;
+      background: linear-gradient(135deg, #252525 0%, #1e1e1e 100%);
+      border-color: #2ecc71;
+      color: #2ecc71;
+    }
+
+    button#scanBtn.scanning {
+      border-color: #2ecc71;
+      color: #2ecc71;
+      animation: pulse-border 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: #2ecc71; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+      50% { border-color: #27ae60; box-shadow: 0 0 12px 0 rgba(46, 204, 113, 0.15); }
+    }
+
+    .scan-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
     }
 
     .camera-panel {
       display: none;
       margin-top: 12px;
-      background: #0f0f0f;
+      background: #0a0a0a;
       border: 1px solid #1f1f1f;
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 14px;
+      padding: 14px;
+      position: relative;
     }
 
-    .camera-panel.open { display: block; }
+    .camera-panel.open { display: block; animation: fadeSlide 0.25s ease; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reader-wrapper {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #050505;
+      border: 1px solid #1a1a1a;
+    }
 
     #reader {
       width: 100%;
-      border-radius: 10px;
+      border-radius: 0;
       overflow: hidden;
       background: #050505;
-      border: 1px solid #222;
     }
 
-    .camera-help {
-      margin-top: 8px;
+    /* Scanning frame corners */
+    .scan-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      max-width: 260px;
+      aspect-ratio: 2.2 / 1;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .scan-corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #2ecc71;
+      border-style: solid;
+      border-width: 0;
+    }
+
+    .scan-corner.tl { top: 0; left: 0; border-top-width: 3px; border-left-width: 3px; border-top-left-radius: 6px; }
+    .scan-corner.tr { top: 0; right: 0; border-top-width: 3px; border-right-width: 3px; border-top-right-radius: 6px; }
+    .scan-corner.bl { bottom: 0; left: 0; border-bottom-width: 3px; border-left-width: 3px; border-bottom-left-radius: 6px; }
+    .scan-corner.br { bottom: 0; right: 0; border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 6px; }
+
+    .scan-line {
+      position: absolute;
+      left: 8%;
+      width: 84%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #2ecc71, transparent);
+      opacity: 0.8;
+      animation: scanLine 2s ease-in-out infinite;
+    }
+
+    @keyframes scanLine {
+      0%, 100% { top: 15%; }
+      50% { top: 85%; }
+    }
+
+    .camera-status {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 0.82rem;
       color: #7b7b7b;
       line-height: 1.4;
+    }
+
+    .camera-status.active { color: #2ecc71; }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #7b7b7b;
+      flex-shrink: 0;
+    }
+
+    .camera-status.active .status-dot {
+      background: #2ecc71;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     .camera-controls {
@@ -144,13 +244,20 @@
     }
 
     .camera-close {
-      background: transparent;
+      background: #1a1a1a;
       border: 1px solid #303030;
       color: #aaa;
       border-radius: 8px;
-      padding: 7px 10px;
+      padding: 8px 14px;
       cursor: pointer;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .camera-close:hover {
+      background: #252525;
+      color: #e0e0e0;
     }
 
     /* Loading */
@@ -464,12 +571,31 @@
     </div>
 
     <div class="scan-actions">
-      <button id="scanBtn" onclick="startScanner()">Scan with Camera</button>
+      <button id="scanBtn" onclick="toggleScanner()">
+        <svg class="scan-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+          <path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+        </svg>
+        <span id="scanBtnText">Scan with Camera</span>
+      </button>
     </div>
 
     <div id="cameraPanel" class="camera-panel">
-      <div id="reader"></div>
-      <p id="cameraStatus" class="camera-help">Point your camera at a barcode. Detection starts automatically.</p>
+      <div class="reader-wrapper">
+        <div id="reader"></div>
+        <div class="scan-overlay" id="scanOverlay">
+          <div class="scan-corner tl"></div>
+          <div class="scan-corner tr"></div>
+          <div class="scan-corner bl"></div>
+          <div class="scan-corner br"></div>
+          <div class="scan-line"></div>
+        </div>
+      </div>
+      <div id="cameraStatus" class="camera-status">
+        <span class="status-dot"></span>
+        <span id="cameraStatusText">Point your camera at a barcode.</span>
+      </div>
       <div class="camera-controls">
         <button class="camera-close" onclick="stopScanner()">Close Camera</button>
       </div>
@@ -554,13 +680,21 @@
     const errorBox = document.getElementById('error');
     const results  = document.getElementById('results');
     const cameraPanel = document.getElementById('cameraPanel');
-    const cameraStatus = document.getElementById('cameraStatus');
+    const cameraStatusEl = document.getElementById('cameraStatus');
+    const cameraStatusText = document.getElementById('cameraStatusText');
+    const scanBtn = document.getElementById('scanBtn');
+    const scanBtnText = document.getElementById('scanBtnText');
 
     let html5QrCode = null;
     let scannerActive = false;
     let lastScan = '';
 
     input.addEventListener('keydown', e => { if (e.key === 'Enter') analyze(); });
+
+    function setCameraStatus(text, active) {
+      cameraStatusText.textContent = text;
+      cameraStatusEl.className = active ? 'camera-status active' : 'camera-status';
+    }
 
     function getScoreMeta(score) {
       if (score >= 90) return { label: 'CLEAN',     cls: 'clean',     badgeCls: 'badge-clean',     barCls: 'bar-clean'     };
@@ -581,6 +715,14 @@
       errorBox.textContent   = '';
     }
 
+    function toggleScanner() {
+      if (scannerActive) {
+        stopScanner();
+      } else {
+        startScanner();
+      }
+    }
+
     async function startScanner() {
       if (!window.Html5Qrcode) {
         showError('Camera scanner failed to load. You can still enter a barcode manually.');
@@ -590,7 +732,9 @@
       if (scannerActive) return;
 
       cameraPanel.classList.add('open');
-      cameraStatus.textContent = 'Requesting camera permission...';
+      scanBtn.classList.add('scanning');
+      scanBtnText.textContent = 'Scanning...';
+      setCameraStatus('Requesting camera permission...', false);
 
       try {
         if (!html5QrCode) {
@@ -613,15 +757,20 @@
         );
 
         scannerActive = true;
-        cameraStatus.textContent = 'Scanning... center the barcode inside the frame.';
+        setCameraStatus('Scanning — center the barcode inside the frame', true);
       } catch (err) {
-        cameraStatus.textContent = 'Could not access camera. You can still type the barcode manually.';
-        showError('Camera access failed. Please allow permission or use manual input.');
+        setCameraStatus('Could not access camera. Use manual input below.', false);
+        scanBtn.classList.remove('scanning');
+        scanBtnText.textContent = 'Scan with Camera';
+        showError('Camera access denied. Please allow camera permission in your browser settings, or enter the barcode manually.');
       }
     }
 
     async function stopScanner() {
       cameraPanel.classList.remove('open');
+      scanBtn.classList.remove('scanning');
+      scanBtnText.textContent = 'Scan with Camera';
+
       if (!html5QrCode || !scannerActive) return;
 
       try {
@@ -637,7 +786,7 @@
       }
 
       scannerActive = false;
-      cameraStatus.textContent = 'Point your camera at a barcode. Detection starts automatically.';
+      setCameraStatus('Point your camera at a barcode.', false);
     }
 
     async function onBarcodeDetected(decodedText) {
@@ -646,7 +795,7 @@
       lastScan = value;
 
       input.value = value;
-      cameraStatus.textContent = `Detected barcode: ${value}. Analyzing...`;
+      setCameraStatus(`Detected: ${value} — analyzing...`, true);
       await stopScanner();
       analyze();
 
