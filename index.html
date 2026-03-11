@@ -449,20 +449,159 @@
       border-color: #3a3a3a;
     }
 
-    .additive-tag .additive-full {
-      display: none;
-      margin-left: 4px;
-      color: #888;
-      font-size: 0.78rem;
-    }
-
-    .additive-tag.expanded .additive-full {
-      display: inline;
-    }
-
     .no-additives {
       color: #2ecc71;
       font-size: 0.9rem;
+    }
+
+    /* Additive detail card (expanded) */
+    .additive-detail {
+      display: none;
+      margin-top: 8px;
+      background: #0d0d0d;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 100%;
+      animation: fadeSlide 0.2s ease;
+    }
+
+    .additive-detail.open { display: block; }
+
+    .additive-detail-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .additive-detail-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #e0e0e0;
+    }
+
+    .risk-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .risk-low { background: #1a3d28; color: #2ecc71; }
+    .risk-moderate { background: #3d2a00; color: #f39c12; }
+    .risk-high { background: #3d0f0f; color: #e74c3c; }
+
+    .additive-detail-section {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: #999;
+    }
+
+    .additive-detail-section strong {
+      color: #bbb;
+      font-weight: 600;
+    }
+
+    .source-link {
+      color: #5b9bd5;
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+
+    .source-link:hover { text-decoration: underline; }
+
+    .source-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    /* Seed Oils */
+    .seed-oils-block {
+      background: #0f0f0f;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 10px;
+    }
+
+    .seed-oils-title {
+      color: #e74c3c;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .seed-oils-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .seed-oil-tag {
+      background: #2a0f0f;
+      border: 1px solid #5c1a1a;
+      border-radius: 6px;
+      color: #e74c3c;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      user-select: none;
+    }
+
+    .seed-oil-tag:hover {
+      background: #3d1515;
+      border-color: #e74c3c;
+    }
+
+    /* Seed oil detail card */
+    .seed-oil-detail {
+      display: none;
+      margin-top: 8px;
+      background: #1a0a0a;
+      border: 1px solid #3d1515;
+      border-radius: 10px;
+      padding: 12px 14px;
+      width: 100%;
+      animation: fadeSlide 0.2s ease;
+    }
+
+    .seed-oil-detail.open { display: block; }
+
+    .seed-oil-detail-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .seed-oil-detail-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #e0e0e0;
+    }
+
+    .avoid-badge {
+      background: #3d0f0f;
+      color: #e74c3c;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 999px;
     }
 
     .legal-note {
@@ -682,6 +821,11 @@
         <div class="additives-block">
           <div class="additives-title">Additives</div>
           <div id="additivesList" class="additives-list"></div>
+        </div>
+
+        <div id="seedOilsBlock" class="seed-oils-block" style="display:none;">
+          <div class="seed-oils-title">⚠ Seed Oils Detected</div>
+          <div id="seedOilsList" class="seed-oils-list"></div>
         </div>
       </div>
     </div>
@@ -923,17 +1067,108 @@
           const isObj = typeof a === 'object';
           const code = isObj ? (a.commonName || a.name || 'Unknown') : String(a);
           const fullName = isObj && a.name ? a.name : '';
+          const risk = isObj && a.riskLevel ? a.riskLevel.toUpperCase() : '';
+          const concerns = isObj && a.concerns ? a.concerns : '';
+          const fitness = isObj && a.fitnessImpact ? a.fitnessImpact : '';
+          const sources = isObj && Array.isArray(a.sources) ? a.sources : [];
+
+          const wrapper = document.createElement('div');
+          wrapper.style.cssText = 'display:contents;';
+
           const tag = document.createElement('span');
           tag.className = 'additive-tag';
           tag.textContent = code;
-          if (fullName && fullName !== code) {
-            const detail = document.createElement('span');
-            detail.className = 'additive-full';
-            detail.textContent = '— ' + fullName + ' (' + code + ')';
-            tag.appendChild(detail);
-            tag.addEventListener('click', () => tag.classList.toggle('expanded'));
+          wrapper.appendChild(tag);
+
+          // Build expandable detail card
+          const detail = document.createElement('div');
+          detail.className = 'additive-detail';
+          let detailHTML = '<div class="additive-detail-header">';
+          detailHTML += '<span class="additive-detail-name">' + escapeHtml(fullName || code) + '</span>';
+          if (risk) {
+            const riskCls = risk === 'HIGH' ? 'risk-high' : risk === 'MODERATE' ? 'risk-moderate' : 'risk-low';
+            detailHTML += '<span class="risk-badge ' + riskCls + '">' + escapeHtml(risk) + '</span>';
           }
+          detailHTML += '</div>';
+          if (concerns) detailHTML += '<div class="additive-detail-section"><strong>Concerns:</strong> ' + escapeHtml(concerns) + '</div>';
+          if (fitness) detailHTML += '<div class="additive-detail-section"><strong>Fitness impact:</strong> ' + escapeHtml(fitness) + '</div>';
+          if (sources.length > 0) {
+            detailHTML += '<div class="additive-detail-section"><strong>Sources:</strong><div class="source-links">';
+            sources.forEach(s => {
+              if (typeof s === 'object' && s.url) {
+                detailHTML += '<a class="source-link" href="' + escapeAttr(s.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(s.label || s.url) + ' →</a>';
+              } else if (typeof s === 'string') {
+                detailHTML += '<span class="source-link">' + escapeHtml(s) + '</span>';
+              }
+            });
+            detailHTML += '</div></div>';
+          }
+          detail.innerHTML = detailHTML;
+          wrapper.appendChild(detail);
+
+          tag.addEventListener('click', () => {
+            const isOpen = detail.classList.toggle('open');
+            // Close other open additive details
+            if (isOpen) {
+              list.querySelectorAll('.additive-detail.open').forEach(d => { if (d !== detail) d.classList.remove('open'); });
+            }
+          });
+
           list.appendChild(tag);
+          list.appendChild(detail);
+        });
+      }
+
+      // Seed Oils
+      const seedOilsBlock = document.getElementById('seedOilsBlock');
+      const seedOilsList = document.getElementById('seedOilsList');
+      seedOilsList.innerHTML = '';
+      const seedOils = Array.isArray(data.seedOils) ? data.seedOils : [];
+      if (seedOils.length === 0) {
+        seedOilsBlock.style.display = 'none';
+      } else {
+        seedOilsBlock.style.display = 'block';
+        seedOils.forEach(oil => {
+          const isObj = typeof oil === 'object';
+          const name = isObj ? (oil.name || 'Unknown') : String(oil);
+          const concerns = isObj && oil.concerns ? oil.concerns : '';
+          const fitness = isObj && oil.fitnessImpact ? oil.fitnessImpact : '';
+          const sources = isObj && Array.isArray(oil.sources) ? oil.sources : [];
+
+          const tag = document.createElement('span');
+          tag.className = 'seed-oil-tag';
+          tag.textContent = name;
+
+          const detail = document.createElement('div');
+          detail.className = 'seed-oil-detail';
+          let dHTML = '<div class="seed-oil-detail-header">';
+          dHTML += '<span class="seed-oil-detail-name">' + escapeHtml(name) + '</span>';
+          dHTML += '<span class="avoid-badge">AVOID</span>';
+          dHTML += '</div>';
+          if (concerns) dHTML += '<div class="additive-detail-section"><strong>Why avoid:</strong> ' + escapeHtml(concerns) + '</div>';
+          if (fitness) dHTML += '<div class="additive-detail-section"><strong>Fitness impact:</strong> ' + escapeHtml(fitness) + '</div>';
+          if (sources.length > 0) {
+            dHTML += '<div class="additive-detail-section"><strong>Research:</strong><div class="source-links">';
+            sources.forEach(s => {
+              if (typeof s === 'object' && s.url) {
+                dHTML += '<a class="source-link" href="' + escapeAttr(s.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(s.label || s.url) + ' →</a>';
+              } else if (typeof s === 'string') {
+                dHTML += '<span class="source-link">' + escapeHtml(s) + '</span>';
+              }
+            });
+            dHTML += '</div></div>';
+          }
+          detail.innerHTML = dHTML;
+
+          tag.addEventListener('click', () => {
+            const isOpen = detail.classList.toggle('open');
+            if (isOpen) {
+              seedOilsList.querySelectorAll('.seed-oil-detail.open').forEach(d => { if (d !== detail) d.classList.remove('open'); });
+            }
+          });
+
+          seedOilsList.appendChild(tag);
+          seedOilsList.appendChild(detail);
         });
       }
 
@@ -949,6 +1184,16 @@
       const isOpen = panel.classList.toggle('open');
       document.getElementById('expandBtn').innerHTML =
         `${isOpen ? 'Hide' : 'View'} Full Nutrition <span id="expandArrow">${isOpen ? '▲' : '▼'}</span>`;
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function escapeAttr(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
   </script>
 
