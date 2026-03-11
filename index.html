@@ -39,10 +39,10 @@
     .card {
       background: #111;
       border: 1px solid #1e1e1e;
-      border-radius: 16px;
-      padding: 28px 24px;
+      border-radius: 20px;
+      padding: 32px 28px;
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
     }
 
     .input-group {
@@ -295,53 +295,57 @@
     /* Results */
     #results {
       display: none;
-      margin-top: 28px;
+      margin-top: 32px;
     }
 
     .product-header {
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 18px;
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #1a1a1a;
     }
 
     .product-image {
-      width: 72px;
-      height: 72px;
+      width: 96px;
+      height: 96px;
       object-fit: contain;
-      border-radius: 10px;
-      background: #1a1a1a;
-      border: 1px solid #222;
+      border-radius: 14px;
+      background: #161616;
+      border: 1px solid #252525;
       flex-shrink: 0;
+      padding: 6px;
     }
 
     .product-name {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #f0f0f0;
-      line-height: 1.3;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.35;
+      letter-spacing: -0.3px;
     }
 
     /* Score */
     .score-block {
-      background: #0f0f0f;
+      background: #0c0c0c;
       border: 1px solid #1e1e1e;
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 14px;
+      padding: 28px 24px;
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .score-label {
-      font-size: 0.75rem;
-      letter-spacing: 2px;
+      font-size: 0.72rem;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
-      color: #666;
-      margin-bottom: 8px;
+      color: #555;
+      margin-bottom: 10px;
     }
 
     .score-number {
-      font-size: 3.5rem;
+      font-size: 4rem;
       font-weight: 800;
       line-height: 1;
     }
@@ -349,19 +353,19 @@
     .score-badge {
       display: inline-block;
       border-radius: 999px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 1.5px;
-      margin-top: 10px;
-      padding: 4px 16px;
+      margin-top: 14px;
+      padding: 5px 18px;
       text-transform: uppercase;
     }
 
     .score-bar-track {
       background: #1a1a1a;
       border-radius: 999px;
-      height: 6px;
-      margin-top: 14px;
+      height: 5px;
+      margin-top: 18px;
       overflow: hidden;
       width: 100%;
     }
@@ -373,20 +377,26 @@
     }
 
     /* Color themes */
-    .clean   { color: #2ecc71; }
-    .good    { color: #a8e063; }
-    .processed { color: #f39c12; }
-    .slop    { color: #e74c3c; }
+    .clean      { color: #2ecc71; }
+    .good       { color: #a8e063; }
+    .processed  { color: #f1c40f; }
+    .slop       { color: #f39c12; }
+    .heavy-slop { color: #e67e22; }
+    .ultra-slop { color: #c0392b; }
 
-    .badge-clean     { background: #1a3d28; color: #2ecc71; }
-    .badge-good      { background: #2a3b10; color: #a8e063; }
-    .badge-processed { background: #3d2a00; color: #f39c12; }
-    .badge-slop      { background: #3d0f0f; color: #e74c3c; }
+    .badge-clean      { background: #1a3d28; color: #2ecc71; }
+    .badge-good       { background: #2a3b10; color: #a8e063; }
+    .badge-processed  { background: #3d3400; color: #f1c40f; }
+    .badge-slop       { background: #3d2a00; color: #f39c12; }
+    .badge-heavy-slop { background: #3d1a00; color: #e67e22; }
+    .badge-ultra-slop { background: #3d0f0f; color: #c0392b; }
 
-    .bar-clean     { background: #2ecc71; }
-    .bar-good      { background: #a8e063; }
-    .bar-processed { background: #f39c12; }
-    .bar-slop      { background: #e74c3c; }
+    .bar-clean      { background: #2ecc71; }
+    .bar-good       { background: #a8e063; }
+    .bar-processed  { background: #f1c40f; }
+    .bar-slop       { background: #f39c12; }
+    .bar-heavy-slop { background: #e67e22; }
+    .bar-ultra-slop { background: #c0392b; }
 
     /* Detail rows */
     .detail-row {
@@ -412,18 +422,19 @@
 
     /* Additives */
     .additives-block {
-      background: #0f0f0f;
+      background: #0c0c0c;
       border: 1px solid #1e1e1e;
-      border-radius: 10px;
-      padding: 14px 16px;
+      border-radius: 12px;
+      padding: 16px 18px;
     }
 
     .additives-title {
-      color: #888;
-      font-size: 0.8rem;
-      letter-spacing: 1.5px;
+      color: #777;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      font-weight: 600;
     }
 
     .additives-list {
@@ -523,20 +534,20 @@
 
     /* Seed Oils */
     .seed-oils-block {
-      background: #0f0f0f;
+      background: #0c0c0c;
       border: 1px solid #1e1e1e;
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-top: 10px;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 14px;
     }
 
     .seed-oils-title {
       color: #e74c3c;
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      letter-spacing: 1.5px;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -605,14 +616,14 @@
     }
 
     .legal-note {
-      margin-top: 16px;
-      border: 1px solid #2a2a2a;
-      background: #0d0d0d;
+      margin-top: 24px;
+      border: 1px solid #1e1e1e;
+      background: #0a0a0a;
       border-radius: 10px;
-      color: #7f7f7f;
-      font-size: 0.78rem;
-      line-height: 1.45;
-      padding: 10px 12px;
+      color: #5a5a5a;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      padding: 12px 14px;
     }
 
     .legal-note strong {
@@ -624,72 +635,74 @@
     .macro-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
     .macro-item {
-      background: #0f0f0f;
+      background: #0c0c0c;
       border: 1px solid #1e1e1e;
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px 4px 8px;
-      gap: 2px;
+      padding: 14px 6px 12px;
+      gap: 4px;
     }
 
-    .macro-icon { font-size: 1.1rem; line-height: 1; }
+    .macro-icon { font-size: 1.5rem; line-height: 1; }
 
     .macro-val {
-      font-size: 0.88rem;
+      font-size: 1rem;
       font-weight: 700;
       color: #f0f0f0;
+      margin-top: 2px;
     }
 
     .macro-key {
-      font-size: 0.65rem;
-      color: #666;
+      font-size: 0.62rem;
+      color: #555;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      font-weight: 500;
     }
 
     /* Expand button */
     .expand-btn {
       width: 100%;
-      background: #161616;
-      border: 1px solid #2a2a2a;
+      background: #141414;
+      border: 1px solid #252525;
       border-radius: 10px;
-      color: #888;
+      color: #777;
       cursor: pointer;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
-      padding: 11px 16px;
+      padding: 12px 16px;
       text-align: center;
       transition: background 0.2s, color 0.2s;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
 
-    .expand-btn:hover { background: #1e1e1e; color: #ccc; }
+    .expand-btn:hover { background: #1c1c1c; color: #ccc; }
 
     /* Full nutrition panel */
     .full-nutrition { display: none; }
     .full-nutrition.open { display: block; }
 
     .nutrition-table {
-      background: #0f0f0f;
+      background: #0c0c0c;
       border: 1px solid #1e1e1e;
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
-      margin-bottom: 10px;
+      margin-bottom: 16px;
     }
 
     .nt-header {
-      padding: 8px 16px;
-      font-size: 0.7rem;
-      letter-spacing: 1.5px;
+      padding: 10px 16px;
+      font-size: 0.68rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      color: #555;
+      color: #4a4a4a;
       border-bottom: 1px solid #1a1a1a;
     }
 
@@ -697,13 +710,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 11px 16px;
+      padding: 12px 16px;
       font-size: 0.9rem;
-      border-bottom: 1px solid #1a1a1a;
+      border-bottom: 1px solid #151515;
     }
 
     .nt-row:last-child { border-bottom: none; }
-    .nt-key { color: #888; }
+    .nt-key { color: #777; }
     .nt-val { color: #e0e0e0; font-weight: 600; }
 
     @media (max-width: 400px) {
@@ -711,7 +724,10 @@
       .input-group { flex-direction: column; }
       button#analyzeBtn { width: 100%; }
       .scan-actions { flex-direction: column; }
-      .macro-val { font-size: 0.8rem; }
+      .product-image { width: 80px; height: 80px; }
+      .product-name { font-size: 1.15rem; }
+      .macro-icon { font-size: 1.3rem; }
+      .macro-val { font-size: 0.88rem; }
     }
   </style>
 </head>
@@ -860,10 +876,12 @@
     }
 
     function getScoreMeta(score) {
-      if (score >= 90) return { label: 'CLEAN',     cls: 'clean',     badgeCls: 'badge-clean',     barCls: 'bar-clean'     };
-      if (score >= 70) return { label: 'GOOD',      cls: 'good',      badgeCls: 'badge-good',      barCls: 'bar-good'      };
-      if (score >= 50) return { label: 'PROCESSED', cls: 'processed', badgeCls: 'badge-processed', barCls: 'bar-processed' };
-      return              { label: 'SLOP',      cls: 'slop',      badgeCls: 'badge-slop',      barCls: 'bar-slop'      };
+      if (score >= 90) return { label: 'CLEAN',      cls: 'clean',      badgeCls: 'badge-clean',      barCls: 'bar-clean'      };
+      if (score >= 75) return { label: 'GOOD',       cls: 'good',       badgeCls: 'badge-good',       barCls: 'bar-good'       };
+      if (score >= 60) return { label: 'PROCESSED',  cls: 'processed',  badgeCls: 'badge-processed',  barCls: 'bar-processed'  };
+      if (score >= 45) return { label: 'SLOP',       cls: 'slop',       badgeCls: 'badge-slop',       barCls: 'bar-slop'       };
+      if (score >= 30) return { label: 'HEAVY SLOP', cls: 'heavy-slop', badgeCls: 'badge-heavy-slop', barCls: 'bar-heavy-slop' };
+      return               { label: 'ULTRA SLOP', cls: 'ultra-slop', badgeCls: 'badge-ultra-slop', barCls: 'bar-ultra-slop' };
     }
 
     function showError(msg) {
