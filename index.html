@@ -120,7 +120,7 @@
       color: #555;
     }
 
-    button#analyzeBtn {
+    button#analyseBtn {
       background: #10b981;
       border: none;
       border-radius: 10px;
@@ -136,9 +136,9 @@
       box-shadow: 0 2px 8px rgba(16,185,129,0.2), 0 1px 3px rgba(0,0,0,0.15);
     }
 
-    button#analyzeBtn:hover { background: #059669; box-shadow: 0 4px 14px rgba(16,185,129,0.3), 0 2px 4px rgba(0,0,0,0.2); }
-    button#analyzeBtn:active { transform: scale(0.97); }
-    button#analyzeBtn:disabled { background: #064e3b; color: #555; cursor: not-allowed; }
+    button#analyseBtn:hover { background: #059669; box-shadow: 0 4px 14px rgba(16,185,129,0.3), 0 2px 4px rgba(0,0,0,0.2); }
+    button#analyseBtn:active { transform: scale(0.97); }
+    button#analyseBtn:disabled { background: #064e3b; color: #555; cursor: not-allowed; }
 
     button#scanBtn {
       background: linear-gradient(135deg, #1b1b1b 0%, #151515 100%);
@@ -898,7 +898,7 @@
     @media (max-width: 400px) {
       header h1 { font-size: 2.2rem; }
       .input-group { flex-direction: column; }
-      button#analyzeBtn { width: 100%; }
+      button#analyseBtn { width: 100%; }
       .scan-actions { flex-direction: column; }
       .product-image { width: 80px; height: 80px; }
       .product-name { font-size: 1.15rem; }
@@ -1113,7 +1113,7 @@
   <div class="card">
     <div class="input-group">
       <input type="text" id="barcodeInput" placeholder="Enter barcode" maxlength="50" />
-      <button id="analyzeBtn" onclick="analyze()">Analyze Product</button>
+      <button id="analyseBtn" onclick="analyse()">Analyse Product</button>
     </div>
 
     <div class="scan-actions">
@@ -1179,7 +1179,7 @@
         <div class="loading-dot"></div>
         <div class="loading-dot"></div>
         <div class="loading-dot"></div>
-        <span>Analyzing product</span>
+        <span>Analysing product</span>
       </div>
     </div>
 
@@ -1248,7 +1248,7 @@
           <div class="nt-row"><span class="nt-key">Protein</span><span id="ntProtein" class="nt-val"></span></div>
           <div class="nt-row"><span class="nt-key">Carbohydrates</span><span id="ntCarbs" class="nt-val"></span></div>
           <div class="nt-row"><span class="nt-key">Fat</span><span id="ntFat" class="nt-val"></span></div>
-          <div class="nt-row"><span class="nt-key">Fiber</span><span id="ntFiber" class="nt-val"></span></div>
+          <div class="nt-row"><span class="nt-key">Fibre</span><span id="ntFibre" class="nt-val"></span></div>
           <div class="nt-row"><span class="nt-key">Sugar</span><span id="ntSugar" class="nt-val"></span></div>
           <div class="nt-row"><span class="nt-key">Salt</span><span id="ntSalt" class="nt-val"></span></div>
         </div>
@@ -1276,7 +1276,7 @@
       <div class="modal-section-label">How it works</div>
       <ol class="modal-steps">
         <li><span class="step-num">1</span>Scan a barcode with your camera or type it in manually</li>
-        <li><span class="step-num">2</span>AI analyzes ingredients, additives, and nutritional data from research databases</li>
+        <li><span class="step-num">2</span>AI analyses ingredients, additives, and nutritional data from research databases</li>
         <li><span class="step-num">3</span>Get a Slop Score from 0–100 with detailed breakdowns and sources</li>
       </ol>
     </div>
@@ -1285,7 +1285,7 @@
   <script src="https://unpkg.com/html5-qrcode" defer></script>
   <script>
     const input    = document.getElementById('barcodeInput');
-    const btn      = document.getElementById('analyzeBtn');
+    const btn      = document.getElementById('analyseBtn');
     const loading  = document.getElementById('loading');
     const errorBox = document.getElementById('error');
     const results  = document.getElementById('results');
@@ -1299,7 +1299,7 @@
     let scannerActive = false;
     let lastScan = '';
 
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') analyze(); });
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') analyse(); });
 
     function setCameraStatus(text, active) {
       cameraStatusText.textContent = text;
@@ -1370,7 +1370,7 @@
         );
 
         scannerActive = true;
-        setCameraStatus('Scanning — center the barcode inside the frame', true);
+        setCameraStatus('Scanning — centre the barcode inside the frame', true);
       } catch (err) {
         setCameraStatus('Could not access camera. Use manual input below.', false);
         scanBtn.classList.remove('scanning');
@@ -1408,14 +1408,14 @@
       lastScan = value;
 
       input.value = value;
-      setCameraStatus(`Detected: ${value} — analyzing...`, true);
+      setCameraStatus(`Detected: ${value} — analysing...`, true);
       await stopScanner();
-      analyze();
+      analyse();
 
       setTimeout(() => { lastScan = ''; }, 1500);
     }
 
-    async function analyze() {
+    async function analyse() {
       const barcode = input.value.trim();
       if (!barcode) {
         reset();
@@ -1488,7 +1488,7 @@
       document.getElementById('ntProtein').textContent  = g(data.protein);
       document.getElementById('ntCarbs').textContent    = g(data.carbs);
       document.getElementById('ntFat').textContent      = g(data.fat);
-      document.getElementById('ntFiber').textContent    = g(data.fiber);
+      document.getElementById('ntFibre').textContent    = g(data.fiber);
       document.getElementById('ntSugar').textContent    = data.sugar != null ? data.sugar : 'N/A';
       document.getElementById('ntSalt').textContent     = g(data.salt);
 
@@ -1666,7 +1666,7 @@
     function tryDemo() {
       closeModal();
       input.value = '3017620422003';
-      analyze();
+      analyse();
     }
   </script>
 
